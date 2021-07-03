@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package sv.ues.fmocc.protocolos.webusers;
+package sv.ues.fmocc.protocolos.adm;
 
 import java.io.Serializable;
 import javax.annotation.PostConstruct;
@@ -12,7 +12,7 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.directory.ldap.client.api.LdapConnection;
-import sv.ues.fmocc.protocolos.webusers.entity.UserLDAP;
+import sv.ues.fmocc.protocolos.adm.entity.UserLDAP;
 
 /**
  *

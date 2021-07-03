@@ -1,4 +1,4 @@
-package sv.ues.fmocc.protocolos.webusers;
+package sv.ues.fmocc.protocolos.adm;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;

@@ -1,4 +1,4 @@
-package sv.ues.fmocc.protocolos.webusers.resources;
+package sv.ues.fmocc.protocolos.adm.resources;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

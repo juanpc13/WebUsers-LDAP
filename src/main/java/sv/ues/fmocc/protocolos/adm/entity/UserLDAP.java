@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package sv.ues.fmocc.protocolos.webusers.entity;
+package sv.ues.fmocc.protocolos.adm.entity;
 
 import java.io.Serializable;
 
