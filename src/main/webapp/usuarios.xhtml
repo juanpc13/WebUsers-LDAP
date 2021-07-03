@@ -36,25 +36,38 @@
                                 <div class="p-field p-grid">
                                     <label for="nombres" class="p-col-fixed" style="width:100px;">Nombres</label>
                                     <div class="p-col">
-                                        <p:inputText id="nombres" type="text" />
+                                        <p:inputText id="nombres" value="#{admView.user.nombres}" style="width:33vw" placeholder="Ingrese los nombres" type="text" maxlength="50">
+                                            <p:keyFilter regEx="/[ a-zA-Z]/i"/>
+                                        </p:inputText>
                                     </div>
                                 </div>
                                 <br/>
                                 <div class="p-field p-grid">
                                     <label for="apellidos" class="p-col-fixed" style="width:100px">Apellidos</label>
                                     <div class="p-col">
-                                        <p:inputText id="apellidos" type="text" />
+                                        <p:inputText id="apellidos" value="#{admView.user.apellidos}" style="width:33vw" placeholder="Ingrese los apellidos" type="text" maxlength="50">
+                                            <p:keyFilter regEx="/[ a-zA-Z]/i"/>
+                                        </p:inputText>
                                     </div>
                                 </div>
                                 <br/>
                                 <div class="p-field p-grid">
                                     <label for="uid" class="p-col-fixed" style="width:100px">UID</label>
                                     <div class="p-col">
-                                        <p:inputText id="uid" type="text" />
+                                        <p:inputText id="uid" value="#{admView.user.uid}" style="width:33vw" placeholder="Ingrese el uid o usuario" type="text" maxlength="50" autocomplete="off">
+                                            <p:keyFilter regEx="/[a-zA-Z_.]/i"/>
+                                        </p:inputText>
                                     </div>
                                 </div>
                                 <br/>
-                                <p:commandButton value="Guardar"/>
+                                <div class="p-field p-grid">
+                                    <label for="password" class="p-col-fixed" style="width:100px">Contraseña</label>
+                                    <div class="p-col">
+                                        <p:password id="password" value="#{admView.user.password}" style="width:33vw" placeholder="Ingrese la contraseña" maxlength="50"/>
+                                    </div>
+                                </div>
+                                <br/>
+                                <p:commandButton value="Guardar" actionListener="#{admView.saveUser}"/>
                             </h:panelGrid>
                         </p:tab>
                     </p:tabView>
