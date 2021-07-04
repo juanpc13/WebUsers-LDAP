@@ -42,12 +42,15 @@ public class AuthorizationFilter implements Filter {
             HttpSession ses = reqt.getSession(false);
 
             String reqURI = reqt.getRequestURI();
-            if (reqURI.indexOf("/index.xhtml") >= 0 || (ses != null && ses.getAttribute("uid") != null) || reqURI.contains("javax.faces.resource")) {
-                //System.out.println("Filtrado");
+            // Permitir pagina login
+            // Permitir recursos de JSF
+            // Permitir Si Tiene Sesion UID
+            if (reqURI.contains("login.xhtml")
+                    || reqURI.contains("javax.faces.resource")
+                    || (ses != null && ses.getAttribute("uid") != null)) {
                 chain.doFilter(request, response);
             } else {
-                //System.out.println("Redireccionado");
-                resp.sendRedirect(reqt.getContextPath() + "/index.xhtml");
+                resp.sendRedirect(reqt.getContextPath() + "/login.xhtml");
             }
         } catch (IOException | ServletException e) {
             System.out.println(e.getMessage());

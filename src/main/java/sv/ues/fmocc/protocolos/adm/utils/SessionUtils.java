@@ -6,7 +6,6 @@
 package sv.ues.fmocc.protocolos.adm.utils;
 
 import java.io.IOException;
-import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -32,8 +31,6 @@ public class SessionUtils {
         if (session != null) {
             return (String) session.getAttribute("uid");
         } else {
-            ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
-            context.redirect(context.getRequestContextPath() + "index.xhtml");
             return null;
         }
     }
