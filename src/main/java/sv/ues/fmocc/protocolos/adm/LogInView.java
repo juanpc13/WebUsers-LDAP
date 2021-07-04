@@ -5,12 +5,9 @@
  */
 package sv.ues.fmocc.protocolos.adm;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
@@ -19,6 +16,7 @@ import org.apache.directory.ldap.client.api.LdapConnection;
 import sv.ues.fmocc.protocolos.adm.entity.UserLDAP;
 import sv.ues.fmocc.protocolos.adm.service.UserService;
 import sv.ues.fmocc.protocolos.adm.utils.SessionUtils;
+import sv.ues.fmocc.protocolos.adm.utils.SingleLDAP;
 
 /**
  *
@@ -30,6 +28,8 @@ public class LogInView implements Serializable {
 
     private UserLDAP user;
     private LdapConnection masterConnection;
+    
+    private double number;
 
     private List<UserLDAP> usuarios;
 
@@ -37,6 +37,7 @@ public class LogInView implements Serializable {
     public void init() {
         user = new UserLDAP();
         usuarios = new UserService().getUsuarios();
+        //SingleLDAP conexion = SingleLDAP.getConexion();
     }
 
     public UserLDAP find(String uid) {
