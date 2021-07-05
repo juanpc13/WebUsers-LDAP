@@ -21,58 +21,58 @@ import org.apache.directory.ldap.client.api.LdapNetworkConnection;
  * @author jcpleitez
  */
 public class SingleLDAP {
+
     //Instancia Singleton
     private static SingleLDAP instancia;
     //Atributos de getter y setter
-    private String host;//atol.com
-    private String LectorDn;//cn=admin,dc=atol,dc=com
-    private String LectorPassword;//abc123
+    //private String LectorDn;//cn=admin,dc=atol,dc=com
+    private String UserDn = "cn=admin,dc=atol,dc=com";
+    private String LectorPassword = "abc123";
     //Conexiones
     private LdapConnection connection;
     private LdapConnectionConfig connectionConfig;
-    
 
-    private SingleLDAP(String currentURL) throws LdapInvalidDnException, LdapException, URISyntaxException {
-        //Se obtiene el host
-        this.host = new URI(currentURL).getHost();
-        host = (host.startsWith("www.") ? host.substring(4) : host);
-        //Declaraciones
-        Dn userDn = new Dn(LectorDn);
+    private SingleLDAP(String host) {
         //Se configura la conexion
         connectionConfig = new LdapConnectionConfig();
-        connectionConfig.setLdapHost(host);
-        connectionConfig.setLdapPort(390);
+        //connectionConfig.setLdapHost(host);
+        connectionConfig.setLdapHost("192.168.122.68");
+        connectionConfig.setLdapPort(389);
         //Se crea la conexion
         connection = new LdapNetworkConnection(connectionConfig);
         connection.setTimeOut(-1);
-        connection.bind(userDn, this.LectorPassword);
+        try {
+            Dn dn = new Dn(UserDn);
+            connection.bind(dn, this.LectorPassword);
+            System.out.println("Is Connected? " + connection.isConnected());
+        } catch (LdapInvalidDnException ex) {
+            Logger.getLogger(SingleLDAP.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (LdapException ex) {
+            Logger.getLogger(SingleLDAP.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
-    public static SingleLDAP getInstanceLDAP(String currentURL) throws LdapException {
+    public static SingleLDAP getInstanceLDAP(String currentURL) {
         if (instancia == null) {
-            try {
-                instancia = new SingleLDAP(currentURL);
-            } catch (LdapInvalidDnException | URISyntaxException ex) {
-                Logger.getLogger(SingleLDAP.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            instancia = new SingleLDAP(currentURL);
         }
         return instancia;
     }
 
-    public String getHost() {
-        return host;
+    public LdapConnection getConnection() {
+        return connection;
     }
 
-    public void setHost(String host) {
-        this.host = host;
+    public void setConnection(LdapConnection connection) {
+        this.connection = connection;
     }
-    
+
     public String getLectorDn() {
-        return LectorDn;
+        return UserDn;
     }
 
     public void setLectorDn(String LectorDn) {
-        this.LectorDn = LectorDn;
+        this.UserDn = LectorDn;
     }
 
     public String getLectorPassword() {
@@ -82,5 +82,5 @@ public class SingleLDAP {
     public void setLectorPassword(String LectorPassword) {
         this.LectorPassword = LectorPassword;
     }
-    
+
 }

@@ -9,8 +9,10 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 import javax.annotation.PostConstruct;
+import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.apache.directory.ldap.client.api.LdapConnection;
 import sv.ues.fmocc.protocolos.adm.entity.UserLDAP;
@@ -37,7 +39,17 @@ public class LogInView implements Serializable {
     public void init() {
         user = new UserLDAP();
         usuarios = new UserService().getUsuarios();
-        //SingleLDAP conexion = SingleLDAP.getConexion();
+        
+        //Dominio y Conexion 
+        HttpServletRequest req = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+        String serverName = req.getServerName();
+        SingleLDAP singleLDAP = SingleLDAP.getInstanceLDAP(serverName);
+        if(singleLDAP.getConnection() != null){
+            System.out.println("LDAP is Connected?" + singleLDAP.getConnection().isConnected());
+        }else{
+            System.out.println("Esta nulo");
+        }
+        
     }
 
     public UserLDAP find(String uid) {
