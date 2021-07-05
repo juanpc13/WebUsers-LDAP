@@ -37,7 +37,7 @@ public class SingleLDAP {
         connectionConfig = new LdapConnectionConfig();
         //connectionConfig.setLdapHost(host);
         connectionConfig.setLdapHost("192.168.122.68");
-        connectionConfig.setLdapPort(389);
+        connectionConfig.setLdapPort(10389);
         //Se crea la conexion
         connection = new LdapNetworkConnection(connectionConfig);
         connection.setTimeOut(-1);
