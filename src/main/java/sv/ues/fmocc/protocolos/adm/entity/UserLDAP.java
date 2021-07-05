@@ -13,35 +13,43 @@ import java.io.Serializable;
  */
 public class UserLDAP implements Serializable{
     
-    private String nombres;
-    private String apellidos;
-    private String uid;
-    private String password;
+    private String cn;//nombres
+    private String sn;//apellidos
+    private String uid;//identificador
+    private String userPassword;//clave
+    private String homeDirectory;//
+    private String mailbox;//
+    
+    private String dn;//distinguished name
+    
 
     public UserLDAP() {
     }
 
-    public UserLDAP(String nombres, String apellidos, String uid, String password) {
-        this.nombres = nombres;
-        this.apellidos = apellidos;
+    public UserLDAP(String cn, String sn, String uid, String userPassword, String homeDirectory, String mailbox, String dn) {
+        this.cn = cn;
+        this.sn = sn;
         this.uid = uid;
-        this.password = password;
+        this.userPassword = userPassword;
+        this.homeDirectory = homeDirectory;
+        this.mailbox = mailbox;
+        this.dn = dn;
     }
 
-    public String getNombres() {
-        return nombres;
+    public String getCn() {
+        return cn;
     }
 
-    public void setNombres(String nombres) {
-        this.nombres = nombres;
+    public void setCn(String cn) {
+        this.cn = cn;
     }
 
-    public String getApellidos() {
-        return apellidos;
+    public String getSn() {
+        return sn;
     }
 
-    public void setApellidos(String apellidos) {
-        this.apellidos = apellidos;
+    public void setSn(String sn) {
+        this.sn = sn;
     }
 
     public String getUid() {
@@ -52,28 +60,36 @@ public class UserLDAP implements Serializable{
         this.uid = uid;
     }
 
-    public String getPassword() {
-        return password;
+    public String getUserPassword() {
+        return userPassword;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setUserPassword(String userPassword) {
+        this.userPassword = userPassword;
     }
-    
-    //Metodo para validar si todos los datos del pojo son correctos
-    public boolean ok(){
-        //SE VALIDA QUE NINGUN CAMPO ESTE NULO
-        if(this == null || 
-                this.nombres == null || this.apellidos != null ||
-                this.uid != null || this.password != null){
-            return false;
-        }
-        //SE VALIDA QUE NINGUN CAMPO ESTE VACIO
-        if(this.nombres.isEmpty() || this.apellidos.isEmpty() ||
-                this.uid.isEmpty() || this.password.isEmpty()){
-            return false;
-        }
-        return true;
+
+    public String getHomeDirectory() {
+        return homeDirectory;
+    }
+
+    public void setHomeDirectory(String homeDirectory) {
+        this.homeDirectory = homeDirectory;
+    }
+
+    public String getMailbox() {
+        return mailbox;
+    }
+
+    public void setMailbox(String mailbox) {
+        this.mailbox = mailbox;
+    }
+
+    public String getDn() {
+        return dn;
+    }
+
+    public void setDn(String dn) {
+        this.dn = dn;
     }
 
     @Override

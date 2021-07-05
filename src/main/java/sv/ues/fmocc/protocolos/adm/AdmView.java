@@ -11,7 +11,6 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
-import org.apache.directory.ldap.client.api.LdapConnection;
 import sv.ues.fmocc.protocolos.adm.entity.UserLDAP;
 
 /**
@@ -26,7 +25,6 @@ public class AdmView implements Serializable{
     private String DIR_ROOT = "ou=usuarios,dc=DOMAIN,dc=occ,dc=ues,dc=edu,dc=sv";
     
     private UserLDAP user;
-    private LdapConnection masterConnection;
     
     @PostConstruct
     public void init() {
@@ -57,7 +55,7 @@ public class AdmView implements Serializable{
     }
     
     public void crearLdap() {
-        if (user.ok()) {
+    //    if (user.ok()) {
             
 //            makeMasterConnection(s);
 //            if (masterConnection.isConnected()) {
@@ -104,7 +102,7 @@ public class AdmView implements Serializable{
 //            } else {
 //                addMessage("En ese momento el servidor no está disponible para crear usuarios", true);
 //            }
-        }
+  //      }
     }
     
 }

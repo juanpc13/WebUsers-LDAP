@@ -47,7 +47,7 @@ public class AuthorizationFilter implements Filter {
             // Permitir Si Tiene Sesion UID
             if (reqURI.contains("login.xhtml")
                     || reqURI.contains("javax.faces.resource")
-                    || (ses != null && ses.getAttribute("uid") != null)) {
+                    || (ses != null && ses.getAttribute("userDn") != null && ses.getAttribute("userPassword") != null)) {
                 chain.doFilter(request, response);
             } else {
                 resp.sendRedirect(reqt.getContextPath() + "/login.xhtml");

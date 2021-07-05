@@ -5,18 +5,21 @@
  */
 package sv.ues.fmocc.protocolos.adm;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import org.apache.directory.ldap.client.api.LdapConnection;
 import sv.ues.fmocc.protocolos.adm.entity.UserLDAP;
-import sv.ues.fmocc.protocolos.adm.service.UserService;
 import sv.ues.fmocc.protocolos.adm.utils.SessionUtils;
 import sv.ues.fmocc.protocolos.adm.utils.SingleLDAP;
 
@@ -28,33 +31,12 @@ import sv.ues.fmocc.protocolos.adm.utils.SingleLDAP;
 @ViewScoped
 public class LogInView implements Serializable {
 
-    private UserLDAP user;    
-    private List<UserLDAP> usuarios;
-    
+    private UserLDAP user;
     private SingleLDAP singleLDAP;
 
     @PostConstruct
     public void init() {
         user = new UserLDAP();
-        usuarios = new UserService().getUsuarios();
-        
-        //Dominio y Conexion 
-        //HttpServletRequest req = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-        //String serverName = req.getServerName();
-        singleLDAP = SingleLDAP.getInstanceLDAP("192.168.122.68", "atol");
-        //System.out.println(singleLDAP.authAdm("admin", "abc123"));
-        singleLDAP.search("ou=sistemas,ou=usuarios,dc=atol,dc=com", "(objectClass=top)");
-    }
-
-    public UserLDAP find(String uid) {
-        Iterator<UserLDAP> iUsuarios = usuarios.iterator();
-        while (iUsuarios.hasNext()) {
-            UserLDAP user = iUsuarios.next();
-            if (uid.equals(user.getUid())) {
-                return user;
-            }
-        }
-        return null;
     }
 
     public UserLDAP getUser() {
@@ -66,7 +48,30 @@ public class LogInView implements Serializable {
     }
 
     public void iniciarSesion() {
+        user.setDn("cn="+user.getCn()+",dc=atol,dc=com");//"cn=admin,dc=atol,dc=com"
         
+        singleLDAP = new SingleLDAP(user.getDn(), user.getUserPassword());
+        if (singleLDAP.getContext() != null) {
+            HttpSession session = SessionUtils.getSession();
+            session.setAttribute("userDn", user.getDn());
+            session.setAttribute("userPassword", user.getUserPassword());
+            redirect("/index.xhtml");
+        } else {
+            addMessage(FacesMessage.SEVERITY_WARN, "Conexion a la LDAP", "Host o Credenciales incorrectas");
+        }
+    }
+
+    public void addMessage(FacesMessage.Severity severity, String summary, String detail) {
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, summary, detail));
+    }
+    
+    public void redirect(String url) {
+        ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+        try {
+            context.redirect(context.getRequestContextPath() + url);
+        } catch (IOException ex) {
+            Logger.getLogger(this.getClass().getSimpleName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }
