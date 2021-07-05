@@ -6,22 +6,27 @@
 package sv.ues.fmocc.protocolos.adm.entity;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Juan
  */
-public class UserLDAP implements Serializable{
-    
-    private String cn;//nombres
-    private String sn;//apellidos
+public class UserLDAP implements Serializable {
+
     private String uid;//identificador
+    private String cn;//nombres
+    private String sn;//apellidos    
     private String userPassword;//clave
     private String homeDirectory;//
     private String mailbox;//
-    
+
     private String dn;//distinguished name
-    
 
     public UserLDAP() {
     }
@@ -84,19 +89,49 @@ public class UserLDAP implements Serializable{
         this.mailbox = mailbox;
     }
 
-    public String getDn() {
+    public String dn() {
         return dn;
     }
 
-    public void setDn(String dn) {
+    public void dn(String dn) {
         this.dn = dn;
+    }
+
+    public boolean isComplete() {
+        if (cn == null || sn == null || uid == null || userPassword == null || homeDirectory == null || mailbox == null) {
+            return false;
+        }
+        if (cn.isEmpty() || sn.isEmpty() || uid.isEmpty() || userPassword.isEmpty() || homeDirectory.isEmpty() || mailbox.isEmpty()) {
+            return false;
+        }
+        return true;
+    }
+
+    public Map<String, String> toMap() {
+        Map<String, String> map = new HashMap<>();
+        for (Method m : this.getClass().getMethods()) {
+            if (m.getName().startsWith("get") && m.getParameterTypes().length == 0) {
+                try {
+                    Object r = m.invoke(this);
+                    if (r != null && !r.toString().equals(this.getClass().toString())) {
+                        // Getters a Key-Value
+                        String key = m.getName().substring(3);
+                        String firstLetter = key.substring(0, 1);
+                        key = firstLetter.toLowerCase() + key.substring(1);
+                        map.put(key, r.toString());
+                    }
+                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                    Logger.getLogger(UserLDAP.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        return map;
     }
 
     @Override
     public String toString() {
         //return super.toString(); //To change body of generated methods, choose Tools | Templates.
         return this.uid;
-    }    
-    
-    
+    }
+
 }

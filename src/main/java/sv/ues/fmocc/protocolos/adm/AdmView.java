@@ -6,12 +6,24 @@
 package sv.ues.fmocc.protocolos.adm;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
-import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.BasicAttribute;
+import javax.naming.directory.BasicAttributes;
+import javax.naming.directory.DirContext;
 import sv.ues.fmocc.protocolos.adm.entity.UserLDAP;
+import sv.ues.fmocc.protocolos.adm.utils.SessionUtils;
+import sv.ues.fmocc.protocolos.adm.utils.SingleLDAP;
 
 /**
  *
@@ -19,21 +31,21 @@ import sv.ues.fmocc.protocolos.adm.entity.UserLDAP;
  */
 @Named
 @ViewScoped
-public class AdmView implements Serializable{
-    
-    private String DOMAIN;
-    private String DIR_ROOT = "ou=usuarios,dc=DOMAIN,dc=occ,dc=ues,dc=edu,dc=sv";
-    
+public class AdmView implements Serializable {
+
+    private UserLDAP adm;
     private UserLDAP user;
-    
+    private SingleLDAP singleLDAP;
+
     @PostConstruct
     public void init() {
         user = new UserLDAP();
-        HttpServletRequest req = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-        DOMAIN = req.getServerName();
-        //SE TIENE QUE HACER LA DIVISION DEL COM CON EL DOMINIO
-        //String[] parts = DOMAIN.split(".");
-        //DOMAIN = parts[0];
+        adm = new UserLDAP();
+        adm.setUid(SessionUtils.getUserUID());
+        adm.setUserPassword(SessionUtils.getUserPassword());
+        
+        
+        singleLDAP = new SingleLDAP(adm.dn(), adm.getUserPassword());
     }
 
     public UserLDAP getUser() {
@@ -43,66 +55,31 @@ public class AdmView implements Serializable{
     public void setUser(UserLDAP user) {
         this.user = user;
     }
-    
-    public void saveUser(){
-        if(this.user != null){
-            //Se debe guardar en LDAP el user
-            System.out.println(user.getUid());
-            System.out.println(DOMAIN);
-        }else{
-            System.out.println("El User esta null");
+
+    public void crearUsuario() {
+        if (user.isComplete()) {
+            Attributes attributes = new BasicAttributes();
+            Attribute attribute = new BasicAttribute("objectClass");
+            attribute.add("inetOrgPerson");
+            attribute.add("organizationalPerson");
+            attribute.add("person");
+            attribute.add("simpleSecurityObject");
+            attribute.add("top");
+
+            attributes.put(attribute);
+            // Se recorren todos los getter de la entidad para asignarlos
+            Map<String, String> map = user.toMap();
+            for (String key : map.keySet()) {
+                attributes.put(key, map.get(key));
+            }
+
+            try {
+                singleLDAP.getContext().createSubcontext("uid="+map.get("uid")+"ou=sistemas,ou=usuarios,dc=atol,dc=com", attributes);
+            } catch (NamingException ex) {
+                Logger.getLogger(AdmView.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
         }
     }
-    
-    public void crearLdap() {
-    //    if (user.ok()) {
-            
-//            makeMasterConnection(s);
-//            if (masterConnection.isConnected()) {
-////            encriptar contraseña
-//                StringBuilder builder = new StringBuilder();
-//                builder.append("uid=").append(user.getUid()).append("," + DIR_ROOT);
-//                String dnInsertar = builder.toString();
-//
-//                try {
-//                    masterConnection.add(
-//                            new DefaultEntry(
-//                                    dnInsertar, // The Dn
-//                                    "objectClass: inetOrgPerson",
-//                                    "objectClass: organizationalPerson",
-//                                    "objectClass: person",
-//                                    "objectClass: top",
-//                                    "cn", user.getCn(),
-//                                    "sn", user.getSn(),
-//                                    "uid", user.getUid()
-//                            ));
-//                    usuariosList = getLdapUsers();
-//                    user = new Usuarioldap();
-//                    PrimeFaces current = PrimeFaces.current();
-//                    current.executeScript("PF('ouAgregar').hide();");
-//                    addMessage("Se creó el nuevo usuario", false);
-//                } catch (LdapException ex) {
-//                    Logger.getLogger(FormView.class.getName()).log(Level.SEVERE, null, ex);
-//                    if (ex.getClass() == LdapEntryAlreadyExistsException.class) {
-//                        addMessage("El usuario ya existe dentro de la base de datos", true);
-//                    } else {
-//                        addMessage("Ocurrió un error con el servidor al tratar de crear el usuario", true);
-//                    }
-//                } finally {
-//                    try {
-//                        if (masterConnection != null) {
-//                            masterConnection.unBind();
-//                            masterConnection.close();
-//                        }
-//                    } catch (LdapException | IOException ex) {
-//                        Logger.getLogger(FormView.class.getName()).log(Level.SEVERE, null, ex);
-//                    }
-//                }
-//
-//            } else {
-//                addMessage("En ese momento el servidor no está disponible para crear usuarios", true);
-//            }
-  //      }
-    }
-    
+
 }

@@ -26,10 +26,19 @@ public class SessionUtils {
                 .getExternalContext().getRequest();
     }
 
-    public static String getUserUID() throws IOException {
+    public static String getUserUID() {
         HttpSession session = getSession();
         if (session != null) {
             return (String) session.getAttribute("uid");
+        } else {
+            return null;
+        }
+    }
+    
+    public static String getUserPassword() {
+        HttpSession session = getSession();
+        if (session != null) {
+            return (String) session.getAttribute("userPassword");
         } else {
             return null;
         }

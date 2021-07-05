@@ -48,16 +48,16 @@ public class LogInView implements Serializable {
     }
 
     public void iniciarSesion() {
-        user.setDn("cn="+user.getCn()+",dc=atol,dc=com");//"cn=admin,dc=atol,dc=com"
+        user.dn("cn="+user.getCn()+",dc=atol,dc=com");//"cn=admin,dc=atol,dc=com"
         
-        singleLDAP = new SingleLDAP(user.getDn(), user.getUserPassword());
+        singleLDAP = new SingleLDAP(user.dn(), user.getUserPassword());
         if (singleLDAP.getContext() != null) {
             HttpSession session = SessionUtils.getSession();
-            session.setAttribute("userDn", user.getDn());
+            session.setAttribute("userDn", user.dn());
             session.setAttribute("userPassword", user.getUserPassword());
             redirect("/index.xhtml");
         } else {
-            addMessage(FacesMessage.SEVERITY_WARN, "Conexion a la LDAP", "Host o Credenciales incorrectas");
+            addMessage(FacesMessage.SEVERITY_WARN, "Conexion a LDAP", "Host o Credenciales incorrectas");
         }
     }
 
