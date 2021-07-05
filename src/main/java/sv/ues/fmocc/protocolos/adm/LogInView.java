@@ -28,12 +28,10 @@ import sv.ues.fmocc.protocolos.adm.utils.SingleLDAP;
 @ViewScoped
 public class LogInView implements Serializable {
 
-    private UserLDAP user;
-    private LdapConnection masterConnection;
-    
-    private double number;
-
+    private UserLDAP user;    
     private List<UserLDAP> usuarios;
+    
+    private SingleLDAP singleLDAP;
 
     @PostConstruct
     public void init() {
@@ -41,15 +39,11 @@ public class LogInView implements Serializable {
         usuarios = new UserService().getUsuarios();
         
         //Dominio y Conexion 
-        HttpServletRequest req = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-        String serverName = req.getServerName();
-        SingleLDAP singleLDAP = SingleLDAP.getInstanceLDAP(serverName);
-        if(singleLDAP.getConnection() != null){
-            System.out.println("LDAP is Connected?" + singleLDAP.getConnection().isConnected());
-        }else{
-            System.out.println("Esta nulo");
-        }
-        
+        //HttpServletRequest req = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+        //String serverName = req.getServerName();
+        singleLDAP = SingleLDAP.getInstanceLDAP("192.168.122.68", "atol");
+        //System.out.println(singleLDAP.authAdm("admin", "abc123"));
+        singleLDAP.search("ou=sistemas,ou=usuarios,dc=atol,dc=com", "(objectClass=top)");
     }
 
     public UserLDAP find(String uid) {
@@ -72,13 +66,7 @@ public class LogInView implements Serializable {
     }
 
     public void iniciarSesion() {
-        if (user != null && !user.getUid().isEmpty() && !user.getPassword().isEmpty()) {
-            UserLDAP temp = find(user.getUid());
-            if (user.getPassword().equals(temp.getPassword())) {
-                HttpSession session = SessionUtils.getSession();
-                session.setAttribute("uid", temp.getUid());
-            }
-        }
+        
     }
 
 }

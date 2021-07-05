@@ -5,16 +5,16 @@
  */
 package sv.ues.fmocc.protocolos.adm.utils;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.directory.api.ldap.model.exception.LdapException;
-import org.apache.directory.api.ldap.model.exception.LdapInvalidDnException;
-import org.apache.directory.api.ldap.model.name.Dn;
-import org.apache.directory.ldap.client.api.LdapConnection;
-import org.apache.directory.ldap.client.api.LdapConnectionConfig;
-import org.apache.directory.ldap.client.api.LdapNetworkConnection;
+
+import javax.naming.AuthenticationException;
+import javax.naming.Context;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.directory.*;
 
 /**
  *
@@ -24,63 +24,75 @@ public class SingleLDAP {
 
     //Instancia Singleton
     private static SingleLDAP instancia;
-    //Atributos de getter y setter
-    //private String LectorDn;//cn=admin,dc=atol,dc=com
-    private String UserDn = "cn=admin,dc=atol,dc=com";
-    private String LectorPassword = "abc123";
-    //Conexiones
-    private LdapConnection connection;
-    private LdapConnectionConfig connectionConfig;
+    //Propidades y Conexiones
+    private Properties env;
+    private DirContext connection;
 
-    private SingleLDAP(String host) {
-        //Se configura la conexion
-        connectionConfig = new LdapConnectionConfig();
-        //connectionConfig.setLdapHost(host);
-        connectionConfig.setLdapHost("192.168.122.68");
-        connectionConfig.setLdapPort(10389);
-        //Se crea la conexion
-        connection = new LdapNetworkConnection(connectionConfig);
-        connection.setTimeOut(-1);
+    private SingleLDAP(String host, String domain) {
+        host = "192.168.122.68";
+        domain = "atol";
+        env = new Properties();
+        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+        env.put(Context.PROVIDER_URL, "ldap://" + host + ":389");
+        //env.put(Context.SECURITY_PRINCIPAL, "cn=admin,dc=atol,dc=com");
+        env.put(Context.SECURITY_PRINCIPAL, "cn=admin,dc=atol,dc=com");
+        env.put(Context.SECURITY_CREDENTIALS, "abc123");
+
         try {
-            Dn dn = new Dn(UserDn);
-            connection.bind(dn, this.LectorPassword);
-            System.out.println("Is Connected? " + connection.isConnected());
-        } catch (LdapInvalidDnException ex) {
-            Logger.getLogger(SingleLDAP.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (LdapException ex) {
+            // Se realiza la conexion
+            connection = new InitialDirContext(env);
+        } catch (NamingException ex) {
             Logger.getLogger(SingleLDAP.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public static SingleLDAP getInstanceLDAP(String currentURL) {
+    public static SingleLDAP getInstanceLDAP(String host, String domain) {
         if (instancia == null) {
-            instancia = new SingleLDAP(currentURL);
+            instancia = new SingleLDAP(host, domain);
         }
         return instancia;
     }
 
-    public LdapConnection getConnection() {
-        return connection;
+    public void reconnect(String host, String domain) {
+        instancia = new SingleLDAP(host, domain);
     }
 
-    public void setConnection(LdapConnection connection) {
-        this.connection = connection;
+    public boolean authAdm(String userCn, String password) {
+        if (env != null && connection != null) {
+            if (env.getProperty("userCn").equals(userCn) && env.getProperty("java.naming.security.credentials").equals(password)) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    public String getLectorDn() {
-        return UserDn;
-    }
+    public void search(String search, String filter) {
+        if(connection == null){
+            return;
+        }
+        String[] reqAtt = {"cn", "sn"};
+        SearchControls ctls = new SearchControls();
+        ctls.setReturningObjFlag(true);
 
-    public void setLectorDn(String LectorDn) {
-        this.UserDn = LectorDn;
-    }
+        //Asignamos los atributos a devolver
+        ctls.setReturningAttributes(reqAtt);
+        ctls.setSearchScope(SearchControls.OBJECT_SCOPE);
 
-    public String getLectorPassword() {
-        return LectorPassword;
-    }
-
-    public void setLectorPassword(String LectorPassword) {
-        this.LectorPassword = LectorPassword;
+        NamingEnumeration answer;
+        try {
+            answer = connection.search(search, filter, ctls);
+            while (answer.hasMore()) {
+                SearchResult result = (SearchResult) answer.next();
+                Attributes attr = result.getAttributes();
+                //String name = attr.get("cn").get(0).toString();
+                //deleteUserFromGroup(name,"Administrators");
+                System.out.println(attr.get("cn"));
+                System.out.println(attr.get("uid"));
+                //doSomething(map);
+            }
+        } catch (NamingException ex) {
+            Logger.getLogger(SingleLDAP.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }
