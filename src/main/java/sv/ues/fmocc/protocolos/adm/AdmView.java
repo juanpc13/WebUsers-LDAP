@@ -75,6 +75,7 @@ public class AdmView implements Serializable {
             attribute.add("organizationalPerson");
             attribute.add("person");
             attribute.add("simpleSecurityObject");
+            attribute.add("CourierMailAccount");
             attribute.add("top");
 
             attributes.put(attribute);
@@ -85,7 +86,7 @@ public class AdmView implements Serializable {
             }
 
             try {
-                singleLDAP.getContext().createSubcontext("uid="+map.get("uid")+"ou=sistemas,ou=usuarios,dc=atol,dc=com", attributes);
+                singleLDAP.getContext().createSubcontext("uid="+map.get("uid")+",ou=sistemas,ou=usuarios,dc=atol,dc=com", attributes);
             } catch (NamingException ex) {
                 Logger.getLogger(AdmView.class.getName()).log(Level.SEVERE, null, ex);
             }
