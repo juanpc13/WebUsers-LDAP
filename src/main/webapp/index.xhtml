@@ -20,11 +20,30 @@
                                 <i class="pi pi-users"></i>
                             </f:facet>
                             <h:panelGrid>
-                                <p class="p-m-0">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-                                    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-                                    dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                                </p>
+                                
+                                <p:dataTable id="tablaUsuarios" var="usuario" value="#{admView.usuarios}">
+                                    <p:column headerText="UID">
+                                        <h:outputText value="#{usuario.uid}" />
+                                    </p:column>
+                                    
+                                    <p:column headerText="Correo">
+                                        <h:outputText value="#{usuario.mail}" />
+                                    </p:column>
+
+                                    <p:column headerText="Nombre">
+                                        <h:outputText value="#{usuario.cn}" />
+                                    </p:column>
+
+                                    <p:column headerText="Apellido">
+                                        <h:outputText value="#{usuario.sn}" />
+                                    </p:column>
+
+                                    <p:column style="width:3rem;text-align: center">
+                                        <p:commandButton update="" oncomplete="PF('dialogDatosUsuario').show()" icon="pi pi-info-circle" title="Editar">
+                                            <f:setPropertyActionListener value="#{usuario}" target="#{admView.selectedUsuario}"/>
+                                        </p:commandButton>
+                                    </p:column>
+                                </p:dataTable>
                             </h:panelGrid>
                         </p:tab>                        
                         <p:tab>
@@ -96,6 +115,10 @@
                         </p:tab>
                     </p:tabView>
                 </div>
+                
+                <p:dialog header="Editar Usuario" widgetVar="dialogDatosUsuario" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+                              
+                </p:dialog>
             </h:form>
         </ui:define>
 

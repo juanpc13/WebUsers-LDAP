@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttribute;
@@ -50,13 +51,13 @@ public class UserLDAP implements Serializable {
             if (m.getName().startsWith("set") && m.getParameterTypes().length == 1) {
                 String key = m.getName().substring(3);
                 key = key.substring(0, 1).toLowerCase() + key.substring(1);
-                Object value = buildFromAttributes.get(key);
                 try {
+                    Object value = buildFromAttributes.get(key).get();
                     if (value != null) {
                         m.invoke(temp, value.toString());
                     }
                     //Method method = this.getClass().getMethod(m.getName(), String.class);
-                } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NamingException ex) {
                     Logger.getLogger(UserLDAP.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }

@@ -36,6 +36,7 @@ import sv.ues.fmocc.protocolos.adm.utils.SingleLDAP;
 public class AdmView implements Serializable {
 
     private UserLDAP user;
+    private UserLDAP selectedUsuario;
     private List<UserLDAP> usuarios;
     private SingleLDAP singleLDAP;
 
@@ -53,6 +54,22 @@ public class AdmView implements Serializable {
 
     public void setUser(UserLDAP user) {
         this.user = user;
+    }
+
+    public UserLDAP getSelectedUsuario() {
+        return selectedUsuario;
+    }
+
+    public void setSelectedUsuario(UserLDAP selectedUsuario) {
+        this.selectedUsuario = selectedUsuario;
+    }
+
+    public List<UserLDAP> getUsuarios() {
+        return usuarios;
+    }
+
+    public void setUsuarios(List<UserLDAP> usuarios) {
+        this.usuarios = usuarios;
     }
 
     public void updateUID() {
@@ -115,7 +132,7 @@ public class AdmView implements Serializable {
             singleLDAP = new SingleLDAP(SessionUtils.getUserUserDn(), SessionUtils.getUserPassword());
             NamingEnumeration users = singleLDAP.getContext().search("ou=sistemas,ou=usuarios,dc=atol,dc=com", searchFilter, controls);
             singleLDAP.getContext().close();
-            
+
             SearchResult result = null;
             while (users.hasMore()) {
                 result = (SearchResult) users.next();
