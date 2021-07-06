@@ -8,7 +8,10 @@ package sv.ues.fmocc.protocolos.adm.entity;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,6 +40,28 @@ public class UserLDAP implements Serializable {
     private Attributes attributes;
 
     public UserLDAP() {
+    }
+
+    public UserLDAP BuildUserLDAP(Attributes buildFromAttributes) {
+        //buildFromAttributes.get("");
+        UserLDAP temp = new UserLDAP();
+        Method[] methods = this.getClass().getMethods();
+        for (Method m : methods) {
+            if (m.getName().startsWith("set") && m.getParameterTypes().length == 1) {
+                String key = m.getName().substring(3);
+                key = key.substring(0, 1).toLowerCase() + key.substring(1);
+                Object value = buildFromAttributes.get(key);
+                try {
+                    if (value != null) {
+                        m.invoke(temp, value.toString());
+                    }
+                    //Method method = this.getClass().getMethod(m.getName(), String.class);
+                } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                    Logger.getLogger(UserLDAP.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        return temp;
     }
 
     public UserLDAP(String uid, String cn, String sn, String userPassword, String homeDirectory, String mailbox, String mail, String dn) {
@@ -160,8 +185,7 @@ public class UserLDAP implements Serializable {
                     if (r != null && !r.toString().equals(this.getClass().toString())) {
                         // Getters a Key-Value
                         String key = m.getName().substring(3);
-                        String firstLetter = key.substring(0, 1);
-                        key = firstLetter.toLowerCase() + key.substring(1);
+                        key = key.substring(0, 1).toLowerCase() + key.substring(1);
                         map.put(key, r.toString());
                     }
                 } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
@@ -170,6 +194,18 @@ public class UserLDAP implements Serializable {
             }
         }
         return map;
+    }
+
+    public String[] fieldsList() {
+        List<String> fields = new ArrayList<>();
+        for (Method m : this.getClass().getMethods()) {
+            if (m.getName().startsWith("get") && !m.getName().contains(this.getClass().toString()) && m.getParameterTypes().length == 0) {
+                String key = m.getName().substring(3);
+                key = key.substring(0, 1).toLowerCase() + key.substring(1);
+                fields.add(key);
+            }
+        }
+        return Arrays.copyOf(fields.toArray(), fields.size(),String[].class);
     }
 
     @Override
