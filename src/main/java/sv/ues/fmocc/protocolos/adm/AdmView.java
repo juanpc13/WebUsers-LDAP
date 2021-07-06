@@ -6,21 +6,18 @@
 package sv.ues.fmocc.protocolos.adm;
 
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.naming.AuthenticationException;
+import javax.naming.CommunicationException;
+import javax.naming.NameAlreadyBoundException;
 import javax.naming.NamingException;
-import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
-import javax.naming.directory.BasicAttribute;
-import javax.naming.directory.BasicAttributes;
-import javax.naming.directory.DirContext;
 import sv.ues.fmocc.protocolos.adm.entity.UserLDAP;
 import sv.ues.fmocc.protocolos.adm.utils.SessionUtils;
 import sv.ues.fmocc.protocolos.adm.utils.SingleLDAP;
@@ -39,7 +36,6 @@ public class AdmView implements Serializable {
     @PostConstruct
     public void init() {
         user = new UserLDAP();
-        singleLDAP = new SingleLDAP(SessionUtils.getUserUserDn(), SessionUtils.getUserPassword());
     }
 
     public UserLDAP getUser() {
@@ -49,15 +45,19 @@ public class AdmView implements Serializable {
     public void setUser(UserLDAP user) {
         this.user = user;
     }
-    
-    public void updateUSER() {
+
+    public void updateUID() {
         //user.setCn("");//user.setSn("");//user.setUserPassword("");//user.setUid("");       
         //Creando UID
         String uid = "";
         uid += user.getCn() == null ? "" : user.getCn().toLowerCase();
-        uid += user.getCn() == null || user.getCn().isEmpty() || user.getSn() == null || user.getSn().isEmpty() ? "":".";
-        uid += user.getSn() == null ? "" : user.getSn().toLowerCase();        
+        uid += user.getCn() == null || user.getCn().isEmpty() || user.getSn() == null || user.getSn().isEmpty() ? "" : ".";
+        uid += user.getSn() == null ? "" : user.getSn().toLowerCase();
         user.setUid(uid);
+        updateUSER();
+    }
+
+    public void updateUSER() {
         // Dependen del UID
         user.setHomeDirectory("/home/vmail/atol/" + user.getUid());
         user.setMail(user.getUid() + "@atol.com");
@@ -68,12 +68,34 @@ public class AdmView implements Serializable {
         if (user.isComplete()) {
             Attributes attributes = user.generateAttributes();
             try {
+                singleLDAP = new SingleLDAP(SessionUtils.getUserUserDn(), SessionUtils.getUserPassword());
                 singleLDAP.getContext().createSubcontext("uid=" + user.getUid() + ",ou=sistemas,ou=usuarios,dc=atol,dc=com", attributes);
+                singleLDAP.getContext().close();
+                addMessage(FacesMessage.SEVERITY_INFO, "Correo creado", "");
             } catch (NamingException ex) {
-                Logger.getLogger(AdmView.class.getName()).log(Level.SEVERE, null, ex);
-            }
+                if (ex instanceof NameAlreadyBoundException) {
+                    //Logger.getLogger(AdmView.class.getName()).log(Level.SEVERE, null, ex);
+                    addMessage(FacesMessage.SEVERITY_INFO, "Usuario ya existe", "");
 
+                } else if (ex instanceof CommunicationException) {
+                    Logger.getLogger(AdmView.class.getName()).log(Level.SEVERE, null, ex);
+                    addMessage(FacesMessage.SEVERITY_ERROR, "Error al comunicarse con el host", "");
+
+                } else if (ex instanceof AuthenticationException) {
+                    //Logger.getLogger(AdmView.class.getName()).log(Level.SEVERE, null, ex);
+                    addMessage(FacesMessage.SEVERITY_ERROR, "Credenciales Invalidas", "");
+
+                } else {
+                    addMessage(FacesMessage.SEVERITY_ERROR, "Error no definido", "");
+                    Logger.getLogger(AdmView.class.getName()).log(Level.SEVERE, null, ex);
+
+                }
+            }
         }
+    }
+
+    public void addMessage(FacesMessage.Severity severity, String summary, String detail) {
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, summary, detail));
     }
 
 }

@@ -5,14 +5,8 @@
  */
 package sv.ues.fmocc.protocolos.adm.utils;
 
-import java.util.HashMap;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.naming.AuthenticationException;
 import javax.naming.Context;
-import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.*;
 
@@ -22,26 +16,19 @@ import javax.naming.directory.*;
  */
 public class SingleLDAP {
 
-    //Instancia Singleton
-    private static SingleLDAP instancia;
     //Propidades y Conexiones
-    private Properties env;
+    private final Properties env;
     private DirContext context;
 
-    public SingleLDAP(String userdn, String password) {
+    public SingleLDAP(String userdn, String password) throws NamingException {
         String host = "192.168.122.68";
         env = new Properties();
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         env.put(Context.PROVIDER_URL, "ldap://" + host + ":389");
         env.put(Context.SECURITY_PRINCIPAL, userdn);
         env.put(Context.SECURITY_CREDENTIALS, password);
-
-        try {
-            // Se realiza la conexion
-            context = new InitialDirContext(env);
-        } catch (NamingException ex) {
-            Logger.getLogger(SingleLDAP.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        // Se realiza la conexion
+        context = new InitialDirContext(env);
     }
 
     public DirContext getContext() {
@@ -50,13 +37,6 @@ public class SingleLDAP {
 
     public void setContext(DirContext context) {
         this.context = context;
-    }
-
-    public static SingleLDAP getInstanceLDAP(String host, String domain) {
-        if (instancia == null) {
-            instancia = new SingleLDAP(host, domain);
-        }
-        return instancia;
     }
 
 }

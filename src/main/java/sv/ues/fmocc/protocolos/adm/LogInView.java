@@ -17,6 +17,9 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.naming.AuthenticationException;
+import javax.naming.CommunicationException;
+import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import sv.ues.fmocc.protocolos.adm.entity.UserLDAP;
@@ -48,23 +51,38 @@ public class LogInView implements Serializable {
     }
 
     public void iniciarSesion() {
-        user.dn("cn="+user.getCn()+",dc=atol,dc=com");//"cn=admin,dc=atol,dc=com"
-        
-        singleLDAP = new SingleLDAP(user.dn(), user.getUserPassword());
-        if (singleLDAP.getContext() != null) {
+        user.dn("cn=" + user.getCn() + ",dc=atol,dc=com");//"cn=admin,dc=atol,dc=com"
+
+        try {
+            //Si no genera instancias de excepciones es las credenciales son correctas
+            singleLDAP = new SingleLDAP(user.dn(), user.getUserPassword());
             HttpSession session = SessionUtils.getSession();
             session.setAttribute("userDn", user.dn());
             session.setAttribute("userPassword", user.getUserPassword());
             redirect("/index.xhtml");
-        } else {
-            addMessage(FacesMessage.SEVERITY_WARN, "Conexion a LDAP", "Host o Credenciales incorrectas");
+            singleLDAP.getContext().close();
+            
+        } catch (NamingException ex) {
+            if (ex instanceof CommunicationException) {
+                Logger.getLogger(LogInView.class.getName()).log(Level.SEVERE, null, ex);
+                addMessage(FacesMessage.SEVERITY_ERROR, "Error al comunicarse con el host", "");
+
+            } else if (ex instanceof AuthenticationException) {
+                //Logger.getLogger(LogInView.class.getName()).log(Level.SEVERE, null, ex);
+                addMessage(FacesMessage.SEVERITY_ERROR, "Credenciales Invalidas", "");
+
+            } else {
+                Logger.getLogger(LogInView.class.getName()).log(Level.SEVERE, null, ex);
+                addMessage(FacesMessage.SEVERITY_ERROR, "Error no definido", "");
+
+            }
         }
     }
 
     public void addMessage(FacesMessage.Severity severity, String summary, String detail) {
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, summary, detail));
     }
-    
+
     public void redirect(String url) {
         ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
         try {

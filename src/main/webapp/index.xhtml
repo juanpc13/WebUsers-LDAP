@@ -38,7 +38,7 @@
                                     <div class="p-col">
                                         <p:inputText id="nombre" required="true" value="#{admView.user.cn}" style="width:33vw" placeholder="Ingrese los nombres" type="text" maxlength="50" validatorMessage="Sin Nombres">
                                             <p:keyFilter regEx="/[a-zA-Z]/i"/>
-                                            <p:ajax event="keyup" listener="#{admView.updateUSER}" update="uid, mail, mailbox, homeDirectory"/>
+                                            <p:ajax event="keyup" listener="#{admView.updateUID}" update="uid, mail, mailbox, homeDirectory"/>
                                         </p:inputText>
                                     </div>
                                 </div>
@@ -48,7 +48,7 @@
                                     <div class="p-col">
                                         <p:inputText id="apellido" required="true" value="#{admView.user.sn}" style="width:33vw" placeholder="Ingrese los apellidos" type="text" maxlength="50">
                                             <p:keyFilter regEx="/[a-zA-Z]/i"/>
-                                            <p:ajax event="keyup" listener="#{admView.updateUSER}" update="uid, mail, mailbox, homeDirectory"/>
+                                            <p:ajax event="keyup" listener="#{admView.updateUID}" update="uid, mail, mailbox, homeDirectory"/>
                                         </p:inputText>
                                     </div>
                                 </div>
@@ -58,7 +58,7 @@
                                     <div class="p-col">
                                         <p:inputText id="uid" required="true" value="#{admView.user.uid}" style="width:33vw" placeholder="Ingrese el uid o usuario" type="text" maxlength="50" autocomplete="off">
                                             <p:ajax event="keyup" listener="#{admView.updateUSER}" update="mail, mailbox, homeDirectory"/>
-                                            <p:keyFilter regEx="/[a-zA-Z.]/i"/>
+                                            <p:keyFilter regEx="/[a-zA-Z.0-9]/i"/>
                                         </p:inputText>
                                     </div>
                                 </div>
