@@ -7,8 +7,6 @@ package sv.ues.fmocc.protocolos.adm;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Iterator;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -20,7 +18,6 @@ import javax.inject.Named;
 import javax.naming.AuthenticationException;
 import javax.naming.CommunicationException;
 import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import sv.ues.fmocc.protocolos.adm.entity.UserLDAP;
 import sv.ues.fmocc.protocolos.adm.utils.SessionUtils;
@@ -61,6 +58,7 @@ public class LogInView implements Serializable {
             session.setAttribute("userPassword", user.getUserPassword());
             redirect("/index.xhtml");
             singleLDAP.getContext().close();
+            user = new UserLDAP();
             
         } catch (NamingException ex) {
             if (ex instanceof CommunicationException) {
