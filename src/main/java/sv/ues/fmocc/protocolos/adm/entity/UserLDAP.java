@@ -12,6 +12,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.BasicAttribute;
+import javax.naming.directory.BasicAttributes;
 
 /**
  *
@@ -19,6 +23,7 @@ import java.util.logging.Logger;
  */
 public class UserLDAP implements Serializable {
 
+    //DEBEN TENER GETTER Y SETTERS
     private String uid;//identificador
     private String cn;//nombres
     private String sn;//apellidos
@@ -27,7 +32,9 @@ public class UserLDAP implements Serializable {
     private String mailbox;//
     private String mail;//
 
+    //NO DEBEN TENER GETTER Y SETTERS
     private String dn;//distinguished name
+    private Attributes attributes;
 
     public UserLDAP() {
     }
@@ -99,6 +106,7 @@ public class UserLDAP implements Serializable {
         this.mail = mail;
     }
 
+    ////////Variables NO DEBEN DEFINIR GETTER NI SETTER
     public String dn() {
         return dn;
     }
@@ -107,11 +115,37 @@ public class UserLDAP implements Serializable {
         this.dn = dn;
     }
 
+    public Attributes Attributes() {
+        return attributes;
+    }
+
+    public void Attributes(Attributes attributes) {
+        this.attributes = attributes;
+    }
+
+    public Attributes generateAttributes() {
+        Attribute attribute = attribute = new BasicAttribute("objectClass");
+        attribute.add("inetOrgPerson");
+        attribute.add("organizationalPerson");
+        attribute.add("person");
+        attribute.add("simpleSecurityObject");
+        attribute.add("CourierMailAccount");
+        attribute.add("top");
+        attributes = new BasicAttributes();
+        attributes.put(attribute);
+
+        Map<String, String> map = this.toMap();
+        for (String key : map.keySet()) {
+            attributes.put(key, map.get(key));
+        }
+        return attributes;
+    }
+
     public boolean isComplete() {
         if (cn == null || sn == null || uid == null || userPassword == null || homeDirectory == null || mailbox == null || mail == null) {
             return false;
         }
-        if (cn.isEmpty() || sn.isEmpty() || uid.isEmpty() || userPassword.isEmpty() || homeDirectory.isEmpty() || mailbox.isEmpty()|| mail.isEmpty()) {
+        if (cn.isEmpty() || sn.isEmpty() || uid.isEmpty() || userPassword.isEmpty() || homeDirectory.isEmpty() || mailbox.isEmpty() || mail.isEmpty()) {
             return false;
         }
         return true;

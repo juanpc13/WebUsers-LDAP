@@ -39,7 +39,6 @@ public class AdmView implements Serializable {
     @PostConstruct
     public void init() {
         user = new UserLDAP();
-        
         singleLDAP = new SingleLDAP(SessionUtils.getUserUserDn(), SessionUtils.getUserPassword());
     }
 
@@ -51,42 +50,25 @@ public class AdmView implements Serializable {
         this.user = user;
     }
     
-    public void updateUID(){
+    public void updateUSER() {
+        //user.setCn("");//user.setSn("");//user.setUserPassword("");//user.setUid("");       
+        //Creando UID
         String uid = "";
-        uid += user.getCn() == null ? "" : user.getCn();
-        uid += ".";
-        uid += user.getSn() == null ? "" : user.getSn();
+        uid += user.getCn() == null ? "" : user.getCn().toLowerCase();
+        uid += user.getCn() == null || user.getCn().isEmpty() || user.getSn() == null || user.getSn().isEmpty() ? "":".";
+        uid += user.getSn() == null ? "" : user.getSn().toLowerCase();        
         user.setUid(uid);
+        // Dependen del UID
+        user.setHomeDirectory("/home/vmail/atol/" + user.getUid());
+        user.setMail(user.getUid() + "@atol.com");
+        user.setMailbox("atol/" + user.getUid() + "/");
     }
 
     public void crearUsuario() {
-        //user.setCn("");
-        //user.setSn("");
-        //user.setUserPassword("");
-        //user.setUid("");
-        user.setHomeDirectory("/home/vmail/atol/"+user.getUid());
-        user.setMail(user.getUid()+"@atol.com");
-        user.setMailbox("atol/"+user.getUid()+"/");
-        
         if (user.isComplete()) {
-            Attributes attributes = new BasicAttributes();
-            Attribute attribute = new BasicAttribute("objectClass");
-            attribute.add("inetOrgPerson");
-            attribute.add("organizationalPerson");
-            attribute.add("person");
-            attribute.add("simpleSecurityObject");
-            attribute.add("CourierMailAccount");
-            attribute.add("top");
-
-            attributes.put(attribute);
-            // Se recorren todos los getter de la entidad para asignarlos
-            Map<String, String> map = user.toMap();
-            for (String key : map.keySet()) {
-                attributes.put(key, map.get(key));
-            }
-
+            Attributes attributes = user.generateAttributes();
             try {
-                singleLDAP.getContext().createSubcontext("uid="+map.get("uid")+",ou=sistemas,ou=usuarios,dc=atol,dc=com", attributes);
+                singleLDAP.getContext().createSubcontext("uid=" + user.getUid() + ",ou=sistemas,ou=usuarios,dc=atol,dc=com", attributes);
             } catch (NamingException ex) {
                 Logger.getLogger(AdmView.class.getName()).log(Level.SEVERE, null, ex);
             }

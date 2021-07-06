@@ -32,23 +32,23 @@
                                 <h:outputText value="Registrar"/>
                                 <i class="pi pi-upload"></i>
                             </f:facet>
-                            <h:panelGrid>
+                            <h:panelGrid id="panelGrid">
                                 <div class="p-field p-grid">
-                                    <label for="nombres" class="p-col-fixed" style="width:100px;">Nombres</label>
+                                    <label for="nombre" class="p-col-fixed" style="width:100px;">Nombres</label>
                                     <div class="p-col">
-                                        <p:inputText id="nombres" required="true" value="#{admView.user.cn}" style="width:33vw" placeholder="Ingrese los nombres" type="text" maxlength="50" validatorMessage="Sin Nombres">
-                                            <p:keyFilter regEx="/[ a-zA-Z]/i"/>
-                                            <p:ajax event="keyup" listener="#{admView.updateUID}" update="uid"/>
+                                        <p:inputText id="nombre" required="true" value="#{admView.user.cn}" style="width:33vw" placeholder="Ingrese los nombres" type="text" maxlength="50" validatorMessage="Sin Nombres">
+                                            <p:keyFilter regEx="/[a-zA-Z]/i"/>
+                                            <p:ajax event="keyup" listener="#{admView.updateUSER}" update="uid, mail, mailbox, homeDirectory"/>
                                         </p:inputText>
                                     </div>
                                 </div>
                                 <br/>
                                 <div class="p-field p-grid">
-                                    <label for="apellidos" class="p-col-fixed" style="width:100px">Apellidos</label>
+                                    <label for="apellido" class="p-col-fixed" style="width:100px">Apellidos</label>
                                     <div class="p-col">
-                                        <p:inputText id="apellidos" required="true" value="#{admView.user.sn}" style="width:33vw" placeholder="Ingrese los apellidos" type="text" maxlength="50">
-                                            <p:keyFilter regEx="/[ a-zA-Z]/i"/>
-                                            <p:ajax event="keyup" listener="#{admView.updateUID}" update="uid"/>
+                                        <p:inputText id="apellido" required="true" value="#{admView.user.sn}" style="width:33vw" placeholder="Ingrese los apellidos" type="text" maxlength="50">
+                                            <p:keyFilter regEx="/[a-zA-Z]/i"/>
+                                            <p:ajax event="keyup" listener="#{admView.updateUSER}" update="uid, mail, mailbox, homeDirectory"/>
                                         </p:inputText>
                                     </div>
                                 </div>
@@ -57,8 +57,16 @@
                                     <label for="uid" class="p-col-fixed" style="width:100px">UID</label>
                                     <div class="p-col">
                                         <p:inputText id="uid" required="true" value="#{admView.user.uid}" style="width:33vw" placeholder="Ingrese el uid o usuario" type="text" maxlength="50" autocomplete="off">
+                                            <p:ajax event="keyup" listener="#{admView.updateUSER}" update="mail, mailbox, homeDirectory"/>
                                             <p:keyFilter regEx="/[a-zA-Z.]/i"/>
                                         </p:inputText>
+                                    </div>
+                                </div>
+                                <br/>
+                                <div class="p-field p-grid">
+                                    <label for="mail" class="p-col-fixed" style="width:100px">Correo:</label>
+                                    <div class="p-col">
+                                        <p:inputText id="mail" disabled="true" value="#{admView.user.mail}" style="width:33vw" placeholder="Campo Mail" type="text" maxlength="50" autocomplete="off"/>
                                     </div>
                                 </div>
                                 <br/>
@@ -66,6 +74,20 @@
                                     <label for="password" class="p-col-fixed" style="width:100px">Contraseña</label>
                                     <div class="p-col">
                                         <p:password id="password" required="true" value="#{admView.user.userPassword}" style="width:33vw" placeholder="Ingrese la contraseña" maxlength="50"/>
+                                    </div>
+                                </div>
+                                <br/>                                
+                                <div class="p-field p-grid">
+                                    <label for="mailbox" class="p-col-fixed" style="width:100px">Mailbox</label>
+                                    <div class="p-col">
+                                        <p:inputText id="mailbox" disabled="true" value="#{admView.user.mailbox}" style="width:33vw" placeholder="Mailbox" type="text" maxlength="50" autocomplete="off"/>
+                                    </div>
+                                </div>
+                                <br/>
+                                <div class="p-field p-grid">
+                                    <label for="homeDirectory" class="p-col-fixed" style="width:100px">Home Directory</label>
+                                    <div class="p-col">
+                                        <p:inputText id="homeDirectory" disabled="true" value="#{admView.user.homeDirectory}" style="width:33vw" placeholder="Home Directory" type="text" maxlength="50" autocomplete="off"/>
                                     </div>
                                 </div>
                                 <br/>
