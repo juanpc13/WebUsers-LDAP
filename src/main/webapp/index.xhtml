@@ -14,6 +14,7 @@
             <h:form>
                 <div class="card">
                     <p:tabView id="tabView" activeIndex="1">
+                        <p:ajax event="tabChange" listener="#{admView.cargarUsuarios}" update="tablaUsuarios" />
                         <p:tab>
                             <f:facet name="title">
                                 <h:outputText value="Usuarios"/>

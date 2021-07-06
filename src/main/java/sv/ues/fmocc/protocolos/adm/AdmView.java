@@ -144,6 +144,7 @@ public class AdmView implements Serializable {
     }
 
     public void cargarUsuarios() {
+        usuarios = new ArrayList<>();
         if(properties == null){
             addMessage(FacesMessage.SEVERITY_INFO, "No se han definido propiedades del proyecto", "");
             return;
