@@ -7,6 +7,7 @@ package sv.ues.fmocc.protocolos.adm;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -34,9 +35,17 @@ public class LogInView implements Serializable {
     private UserLDAP user;
     private SingleLDAP singleLDAP;
 
+    private Properties properties;
+
     @PostConstruct
     public void init() {
         user = new UserLDAP();
+        properties = new Properties();
+        try {
+            properties.load(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/WEB-INF/adm.properties"));
+        } catch (IOException ex) {
+            Logger.getLogger(AdmView.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public UserLDAP getUser() {
@@ -48,18 +57,23 @@ public class LogInView implements Serializable {
     }
 
     public void iniciarSesion() {
-        user.dn("cn=" + user.getCn() + ",dc=atol,dc=com");//"cn=admin,dc=atol,dc=com"
+        if(properties == null){
+            addMessage(FacesMessage.SEVERITY_INFO, "No se han definido propiedades del proyecto", "");
+            return;
+        }
+        //Se agrega el DN completo del user admin de la sesion
+        user.dn(properties.getProperty("admDN").replace("$CN", user.getCn()));//"cn=admin,dc=atol,dc=com"
 
         try {
             //Si no genera instancias de excepciones es las credenciales son correctas
-            singleLDAP = new SingleLDAP(user.dn(), user.getUserPassword());
+            singleLDAP = new SingleLDAP(properties, user.dn(), user.getUserPassword());
             HttpSession session = SessionUtils.getSession();
             session.setAttribute("userDn", user.dn());
             session.setAttribute("userPassword", user.getUserPassword());
             redirect("/index.xhtml");
             singleLDAP.getContext().close();
             user = new UserLDAP();
-            
+
         } catch (NamingException ex) {
             if (ex instanceof CommunicationException) {
                 Logger.getLogger(LogInView.class.getName()).log(Level.SEVERE, null, ex);

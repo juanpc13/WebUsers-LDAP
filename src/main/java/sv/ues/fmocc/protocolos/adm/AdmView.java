@@ -5,9 +5,11 @@
  */
 package sv.ues.fmocc.protocolos.adm;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -40,12 +42,20 @@ public class AdmView implements Serializable {
     private List<UserLDAP> usuarios;
     private SingleLDAP singleLDAP;
 
+    private Properties properties;
+
     @PostConstruct
     public void init() {
         user = new UserLDAP();
-        //Se buscan todos los usuarios
         usuarios = new ArrayList<>();
-        cargarUsuarios();
+        // Se cargan las propiedades del proyecto
+        properties = new Properties();
+        try {
+            properties.load(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/WEB-INF/adm.properties"));
+            cargarUsuarios();
+        } catch (IOException ex) {
+            Logger.getLogger(AdmView.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public UserLDAP getUser() {
@@ -84,18 +94,26 @@ public class AdmView implements Serializable {
     }
 
     public void updateUSER() {
-        // Dependen del UID
-        user.setHomeDirectory("/home/vmail/atol/" + user.getUid());
-        user.setMail(user.getUid() + "@atol.com");
-        user.setMailbox("atol/" + user.getUid() + "/");
+        if(properties == null){
+            addMessage(FacesMessage.SEVERITY_INFO, "No se han definido propiedades del proyecto", "");
+            return;
+        }
+        // Dependen del UID y de las propiedades definidas
+        user.setHomeDirectory(properties.getProperty("homeDirectory").replace("$UID", user.getUid()));
+        user.setMail(properties.getProperty("mail").replace("$UID", user.getUid()));
+        user.setMailbox(properties.getProperty("mailbox").replace("$UID", user.getUid()));
     }
 
     public void crearUsuario() {
+        if(properties == null){
+            addMessage(FacesMessage.SEVERITY_INFO, "No se han definido propiedades del proyecto", "");
+            return;
+        }
         if (user.isComplete()) {
             Attributes attributes = user.generateAttributes();
             try {
-                singleLDAP = new SingleLDAP(SessionUtils.getUserUserDn(), SessionUtils.getUserPassword());
-                singleLDAP.getContext().createSubcontext("uid=" + user.getUid() + ",ou=sistemas,ou=usuarios,dc=atol,dc=com", attributes);
+                singleLDAP = new SingleLDAP(properties, SessionUtils.getUserUserDn(), SessionUtils.getUserPassword());
+                singleLDAP.getContext().createSubcontext(properties.getProperty("crearUsuario").replace("$UID", user.getUid()), attributes);
                 singleLDAP.getContext().close();
                 addMessage(FacesMessage.SEVERITY_INFO, "Correo creado", "");
             } catch (NamingException ex) {
@@ -121,7 +139,11 @@ public class AdmView implements Serializable {
     }
 
     public void cargarUsuarios() {
-        String searchFilter = "(objectClass=CourierMailAccount)";
+        if(properties == null){
+            addMessage(FacesMessage.SEVERITY_INFO, "No se han definido propiedades del proyecto", "");
+            return;
+        }
+        String searchFilter = properties.getProperty("filtroUsuarios");
         //String[] reqAtt = {"mail", "mailbox"};
         String[] reqAtt = user.fieldsList();
         SearchControls controls = new SearchControls();
@@ -129,8 +151,8 @@ public class AdmView implements Serializable {
         controls.setReturningAttributes(reqAtt);
 
         try {
-            singleLDAP = new SingleLDAP(SessionUtils.getUserUserDn(), SessionUtils.getUserPassword());
-            NamingEnumeration users = singleLDAP.getContext().search("ou=sistemas,ou=usuarios,dc=atol,dc=com", searchFilter, controls);
+            singleLDAP = new SingleLDAP(properties, SessionUtils.getUserUserDn(), SessionUtils.getUserPassword());
+            NamingEnumeration users = singleLDAP.getContext().search(properties.getProperty("usuariosDN"), searchFilter, controls);
             singleLDAP.getContext().close();
 
             SearchResult result = null;

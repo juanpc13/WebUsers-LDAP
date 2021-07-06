@@ -5,6 +5,7 @@
  */
 package sv.ues.fmocc.protocolos.adm.utils;
 
+import java.io.InputStream;
 import java.util.Properties;
 import javax.naming.Context;
 import javax.naming.NamingException;
@@ -20,11 +21,10 @@ public class SingleLDAP {
     private final Properties env;
     private DirContext context;
 
-    public SingleLDAP(String userdn, String password) throws NamingException {
-        String host = "192.168.122.68";
+    public SingleLDAP(Properties properties, String userdn, String password) throws NamingException {
         env = new Properties();
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-        env.put(Context.PROVIDER_URL, "ldap://" + host + ":389");
+        env.put(Context.PROVIDER_URL, "ldap://" + properties.getProperty("ldapHost") + ":" + properties.getProperty("ldapPort"));
         env.put(Context.SECURITY_PRINCIPAL, userdn);
         env.put(Context.SECURITY_CREDENTIALS, password);
         // Se realiza la conexion
