@@ -33,19 +33,14 @@ import sv.ues.fmocc.protocolos.adm.utils.SingleLDAP;
 @ViewScoped
 public class AdmView implements Serializable {
 
-    private UserLDAP adm;
     private UserLDAP user;
     private SingleLDAP singleLDAP;
 
     @PostConstruct
     public void init() {
         user = new UserLDAP();
-        adm = new UserLDAP();
-        adm.setUid(SessionUtils.getUserUID());
-        adm.setUserPassword(SessionUtils.getUserPassword());
         
-        
-        singleLDAP = new SingleLDAP(adm.dn(), adm.getUserPassword());
+        singleLDAP = new SingleLDAP(SessionUtils.getUserUserDn(), SessionUtils.getUserPassword());
     }
 
     public UserLDAP getUser() {
@@ -55,8 +50,24 @@ public class AdmView implements Serializable {
     public void setUser(UserLDAP user) {
         this.user = user;
     }
+    
+    public void updateUID(){
+        String uid = "";
+        uid += user.getCn() == null ? "" : user.getCn();
+        uid += ".";
+        uid += user.getSn() == null ? "" : user.getSn();
+        user.setUid(uid);
+    }
 
     public void crearUsuario() {
+        //user.setCn("");
+        //user.setSn("");
+        //user.setUserPassword("");
+        //user.setUid("");
+        user.setHomeDirectory("/home/vmail/atol/"+user.getUid());
+        user.setMail(user.getUid()+"@atol.com");
+        user.setMailbox("atol/"+user.getUid()+"/");
+        
         if (user.isComplete()) {
             Attributes attributes = new BasicAttributes();
             Attribute attribute = new BasicAttribute("objectClass");

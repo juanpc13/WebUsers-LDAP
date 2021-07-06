@@ -21,23 +21,25 @@ public class UserLDAP implements Serializable {
 
     private String uid;//identificador
     private String cn;//nombres
-    private String sn;//apellidos    
+    private String sn;//apellidos
     private String userPassword;//clave
     private String homeDirectory;//
     private String mailbox;//
+    private String mail;//
 
     private String dn;//distinguished name
 
     public UserLDAP() {
     }
 
-    public UserLDAP(String cn, String sn, String uid, String userPassword, String homeDirectory, String mailbox, String dn) {
+    public UserLDAP(String uid, String cn, String sn, String userPassword, String homeDirectory, String mailbox, String mail, String dn) {
+        this.uid = uid;
         this.cn = cn;
         this.sn = sn;
-        this.uid = uid;
         this.userPassword = userPassword;
         this.homeDirectory = homeDirectory;
         this.mailbox = mailbox;
+        this.mail = mail;
         this.dn = dn;
     }
 
@@ -89,6 +91,14 @@ public class UserLDAP implements Serializable {
         this.mailbox = mailbox;
     }
 
+    public String getMail() {
+        return mail;
+    }
+
+    public void setMail(String mail) {
+        this.mail = mail;
+    }
+
     public String dn() {
         return dn;
     }
@@ -98,10 +108,10 @@ public class UserLDAP implements Serializable {
     }
 
     public boolean isComplete() {
-        if (cn == null || sn == null || uid == null || userPassword == null || homeDirectory == null || mailbox == null) {
+        if (cn == null || sn == null || uid == null || userPassword == null || homeDirectory == null || mailbox == null || mail == null) {
             return false;
         }
-        if (cn.isEmpty() || sn.isEmpty() || uid.isEmpty() || userPassword.isEmpty() || homeDirectory.isEmpty() || mailbox.isEmpty()) {
+        if (cn.isEmpty() || sn.isEmpty() || uid.isEmpty() || userPassword.isEmpty() || homeDirectory.isEmpty() || mailbox.isEmpty()|| mail.isEmpty()) {
             return false;
         }
         return true;

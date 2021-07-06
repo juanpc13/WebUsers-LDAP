@@ -36,8 +36,9 @@
                                 <div class="p-field p-grid">
                                     <label for="nombres" class="p-col-fixed" style="width:100px;">Nombres</label>
                                     <div class="p-col">
-                                        <p:inputText id="nombres" value="#{admView.user.cn}" style="width:33vw" placeholder="Ingrese los nombres" type="text" maxlength="50">
+                                        <p:inputText id="nombres" required="true" value="#{admView.user.cn}" style="width:33vw" placeholder="Ingrese los nombres" type="text" maxlength="50" validatorMessage="Sin Nombres">
                                             <p:keyFilter regEx="/[ a-zA-Z]/i"/>
+                                            <p:ajax event="keyup" listener="#{admView.updateUID}" update="uid"/>
                                         </p:inputText>
                                     </div>
                                 </div>
@@ -45,8 +46,9 @@
                                 <div class="p-field p-grid">
                                     <label for="apellidos" class="p-col-fixed" style="width:100px">Apellidos</label>
                                     <div class="p-col">
-                                        <p:inputText id="apellidos" value="#{admView.user.sn}" style="width:33vw" placeholder="Ingrese los apellidos" type="text" maxlength="50">
+                                        <p:inputText id="apellidos" required="true" value="#{admView.user.sn}" style="width:33vw" placeholder="Ingrese los apellidos" type="text" maxlength="50">
                                             <p:keyFilter regEx="/[ a-zA-Z]/i"/>
+                                            <p:ajax event="keyup" listener="#{admView.updateUID}" update="uid"/>
                                         </p:inputText>
                                     </div>
                                 </div>
@@ -54,7 +56,7 @@
                                 <div class="p-field p-grid">
                                     <label for="uid" class="p-col-fixed" style="width:100px">UID</label>
                                     <div class="p-col">
-                                        <p:inputText id="uid" value="#{admView.user.uid}" style="width:33vw" placeholder="Ingrese el uid o usuario" type="text" maxlength="50" autocomplete="off">
+                                        <p:inputText id="uid" required="true" value="#{admView.user.uid}" style="width:33vw" placeholder="Ingrese el uid o usuario" type="text" maxlength="50" autocomplete="off">
                                             <p:keyFilter regEx="/[a-zA-Z.]/i"/>
                                         </p:inputText>
                                     </div>
@@ -63,11 +65,11 @@
                                 <div class="p-field p-grid">
                                     <label for="password" class="p-col-fixed" style="width:100px">Contraseña</label>
                                     <div class="p-col">
-                                        <p:password id="password" value="#{admView.user.userPassword}" style="width:33vw" placeholder="Ingrese la contraseña" maxlength="50"/>
+                                        <p:password id="password" required="true" value="#{admView.user.userPassword}" style="width:33vw" placeholder="Ingrese la contraseña" maxlength="50"/>
                                     </div>
                                 </div>
                                 <br/>
-                                <p:commandButton value="Guardar" actionListener="#{admView.crearUsuario}"/>
+                                <p:commandButton value="Guardar" update="msgs" actionListener="#{admView.crearUsuario}"/>
                             </h:panelGrid>
                         </p:tab>
                     </p:tabView>

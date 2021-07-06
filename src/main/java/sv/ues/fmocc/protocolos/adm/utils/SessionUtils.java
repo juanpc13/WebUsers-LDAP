@@ -26,10 +26,10 @@ public class SessionUtils {
                 .getExternalContext().getRequest();
     }
 
-    public static String getUserUID() {
+    public static String getUserUserDn() {
         HttpSession session = getSession();
         if (session != null) {
-            return (String) session.getAttribute("uid");
+            return (String) session.getAttribute("userDn");
         } else {
             return null;
         }
