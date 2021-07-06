@@ -24,7 +24,9 @@ public class SingleLDAP {
     public SingleLDAP(Properties properties, String userdn, String password) throws NamingException {
         env = new Properties();
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-        env.put(Context.PROVIDER_URL, "ldap://" + properties.getProperty("ldapHost") + ":" + properties.getProperty("ldapPort"));
+        env.put("com.sun.jndi.ldap.read.timeout", properties.getProperty("ldapTimeOut"));
+        env.put("com.sun.jndi.ldap.connect.timeout", properties.getProperty("ldapTimeOut"));
+        env.put(Context.PROVIDER_URL, "ldap://" + properties.getProperty("ldapHost") + ":" + properties.getProperty("ldapPort"));        
         env.put(Context.SECURITY_PRINCIPAL, userdn);
         env.put(Context.SECURITY_CREDENTIALS, password);
         // Se realiza la conexion
