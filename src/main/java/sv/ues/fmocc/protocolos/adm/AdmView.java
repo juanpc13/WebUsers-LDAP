@@ -23,6 +23,7 @@ import javax.naming.NameAlreadyBoundException;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
+import javax.naming.directory.InvalidAttributeValueException;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import sv.ues.fmocc.protocolos.adm.entity.UserLDAP;
@@ -124,6 +125,10 @@ public class AdmView implements Serializable {
                 } else if (ex instanceof CommunicationException) {
                     Logger.getLogger(AdmView.class.getName()).log(Level.SEVERE, null, ex);
                     addMessage(FacesMessage.SEVERITY_ERROR, "Error al comunicarse con el host", "");
+
+                } else if (ex instanceof InvalidAttributeValueException) {
+                    //Logger.getLogger(AdmView.class.getName()).log(Level.SEVERE, null, ex);
+                    addMessage(FacesMessage.SEVERITY_ERROR, "Atributos invalidos en el arbol", "");
 
                 } else if (ex instanceof AuthenticationException) {
                     //Logger.getLogger(AdmView.class.getName()).log(Level.SEVERE, null, ex);
